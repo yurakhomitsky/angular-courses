@@ -1,0 +1,43 @@
+<ng-container *ngIf="viewModel$ | async as viewModel; else loading">
+  <mat-form-field class="search-field">
+    <input matInput placeholder="Search.." [ngModel]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
+  </mat-form-field>
+
+  <div class="course-cards-grid">
+    <mat-card class="course-card" *ngFor="let course of viewModel.courses; trackBy: trackById">
+      <img class="image-media" [src]="course.previewImageLink + '/cover.webp'" [alt]="course.title">
+
+      <mat-card-header>
+        <mat-card-title>{{ course.title }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content class="course-card-content">
+        <div class="course-details">
+          <span><strong>Duration: </strong>{{ course.duration | duration }} minutes</span>
+          <span><strong>Lessons: </strong> {{ course.lessonsCount }}</span>
+          <span><strong>Rating: </strong> {{ course.rating }}</span>
+          <span><strong>Status: </strong> {{ course.status }}</span>
+        </div>
+        <div *ngIf="course.meta.skills"><strong>Skills: </strong>{{ course.meta.skills }}</div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <a mat-raised-button color="primary" [routerLink]="course.id">Watch</a>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <mat-paginator
+    class="paginator"
+    aria-label="Select page"
+    [pageIndex]="viewModel.paginator.pageIndex"
+    [length]="viewModel.paginator.length"
+    [pageSize]="viewModel.paginator.pageSize"
+    [showFirstLastButtons]="true"
+    (page)="onPageChange($event)">
+  </mat-paginator>
+</ng-container>
+
+<ng-template #loading>
+  <mat-spinner></mat-spinner>
+</ng-template>
