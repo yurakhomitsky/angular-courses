@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.toolbar {
+  min-height: 4rem;
+}
+
+.content {
+  flex: 1;
+}
+
