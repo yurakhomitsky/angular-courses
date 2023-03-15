@@ -10,32 +10,32 @@ import { VideoPlayerComponent } from '../components/video-player/video-player.co
 import { RouterTestingModule } from '@angular/router/testing';
 
 describe('CourseComponent', () => {
-  let component: CourseComponent;
-  let fixture: ComponentFixture<CourseComponent>;
+	let component: CourseComponent;
+	let fixture: ComponentFixture<CourseComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ CourseComponent, VideoPlayerComponent ],
-        imports: [
-          MatProgressSpinnerModule,
-          MatCardModule,
-          MatButtonModule,
-          CommonModule,
-          RouterTestingModule,
-        ],
-        providers: [{
-          provide: CoursesService,
-          useValue: jasmine.createSpyObj('CoursesService', ['getCourses', 'getCourse'])
-        }]
-    })
-    .compileComponents();
+	beforeEach(async () => {
+		await TestBed.configureTestingModule({
+				declarations: [CourseComponent, VideoPlayerComponent],
+				imports: [
+					MatProgressSpinnerModule,
+					MatCardModule,
+					MatButtonModule,
+					CommonModule,
+					RouterTestingModule
+				],
+				providers: [{
+					provide: CoursesService,
+					useValue: jasmine.createSpyObj('CoursesService', ['getCourses', 'getCourse'])
+				}]
+			})
+			.compileComponents();
 
-    fixture = TestBed.createComponent(CourseComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+		fixture = TestBed.createComponent(CourseComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
+	});
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	it('should create', () => {
+		expect(component).toBeTruthy();
+	});
 });
