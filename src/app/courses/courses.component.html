@@ -6,6 +6,7 @@
   <div class="course-cards-grid">
     <mat-card class="course-card" *ngFor="let course of viewModel.courses; trackBy: trackById">
       <img class="image-media" [src]="course.previewImageLink + '/cover.webp'" [alt]="course.title">
+      <app-progress-bar [duration]="course.duration" [courseId]="course.id"></app-progress-bar>
 
       <mat-card-header>
         <mat-card-title>{{ course.title }}</mat-card-title>

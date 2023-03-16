@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 import { Inject, Injectable } from '@angular/core';
 import { BASE_PATH } from '../tokens/base-url.token';
 
@@ -19,6 +19,7 @@ export class TokenService {
     const url = `${this.basePath}/auth/anonymous?platform=subscriptions`
 
     return this.http.get<{ token: string }>(url).pipe(
+      catchError(() => of({ token: '' })),
       tap(({ token }) => {
         this.token = token;
       }),

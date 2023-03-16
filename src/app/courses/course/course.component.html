@@ -38,24 +38,25 @@
   <main class="lesson-player">
     <div class="player-box">
       <app-video-player *ngIf="selectedLesson$ | async as selectedLesson; else noLessonSelected"
-        [src]="selectedLesson.link"></app-video-player>
+        [src]="selectedLesson.link" [currentTime]="selectedLessonProgressTime" (timeWatch)="onTimeWatchChanged($event)"></app-video-player>
     </div>
+
     <div class="lessons">
-      <mat-card *ngFor="let lesson of course.lessons"
+      <mat-card *ngFor="let lesson of course.lessons; index as index"
         class="lesson-card"
         [class.active-lesson]="lesson.id === (selectedLesson$ | async)?.id"
         [class.locked]="lesson.status === 'locked'"
-        (click)="selectLesson(lesson)">
-        <mat-card-header>
-          <mat-card-title-group>
-            <mat-card-title>{{ lesson.order }} : {{ lesson.title }}</mat-card-title>
-            <mat-card-subtitle>{{ lesson.duration | duration }} </mat-card-subtitle>
-          </mat-card-title-group>
+        (click)="selectLesson(lesson, index)">
+
+        <mat-card-header class="lesson-card-header">
+          <mat-card-title>{{ lesson.order }} : {{ lesson.title }}</mat-card-title>
+          <mat-card-subtitle>{{ lesson.duration | duration }} </mat-card-subtitle>
         </mat-card-header>
+
+        <app-progress-bar [duration]="lesson.duration" [courseId]="course.id" [lessonId]="lesson.id"></app-progress-bar>
       </mat-card>
     </div>
   </main>
-
 </ng-container>
 
 <ng-template #noLessonSelected>

@@ -14,6 +14,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { VideoPlayerComponent } from './components/video-player/video-player.component';
 import { DurationPipe } from './pipes/duration.pipe';
+import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 const routes: Routes = [
   { path: 'courses', pathMatch: 'full', component: CoursesComponent },
@@ -25,11 +27,13 @@ const routes: Routes = [
     CoursesComponent,
     CourseComponent,
     VideoPlayerComponent,
-    DurationPipe
+    DurationPipe,
+    ProgressBarComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
+    MatProgressBarModule,
     MatCardModule,
     MatButtonModule,
     MatFormFieldModule,

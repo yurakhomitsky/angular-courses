@@ -56,11 +56,16 @@ $my-palette: mat.define-palette(mat.$pink-palette);
     overflow: auto;
 
     .lesson-card {
-      height: 5.5rem;
+      --mdc-typography-headline6-font-size: 1rem;
+      min-height: 5.5rem;
       margin-bottom: 0.5rem;
 
       &:hover {
         cursor: pointer;
+      }
+
+      .lesson-card-header {
+        flex: 1;
       }
 
       &.active-lesson {
