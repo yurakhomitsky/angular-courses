@@ -1,14 +1,17 @@
 import {
+	AfterViewInit,
 	ChangeDetectionStrategy,
+	ChangeDetectorRef,
 	Component,
 	ElementRef, EventEmitter,
+	HostBinding,
 	Input, NgZone, OnChanges,
 	OnDestroy,
-	OnInit, Output,
+	 Output,
 	SimpleChanges,
 	ViewChild
 } from '@angular/core';
-import videojs from 'video.js';
+import  Hls from 'hls.js';
 
 @Component({
 	selector: 'app-video-player',
@@ -16,67 +19,78 @@ import videojs from 'video.js';
 	styleUrls: ['./video-player.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class VideoPlayerComponent implements OnChanges, OnInit, OnDestroy {
+export class VideoPlayerComponent implements OnChanges, AfterViewInit, OnDestroy {
 	@Input() public src = '';
 	@Input() public currentTime = 0;
 
+	@Input() public muted = false;
+	@Input() public controls = true;
+
 	@Output() public timeWatch = new EventEmitter<number>();
 
-	@ViewChild('videoPlayer', { static: true }) public videoPlayer!: ElementRef;
+	@ViewChild('videoPlayer') public videoPlayerElementRef!: ElementRef;
 
-	private player!: ReturnType<typeof videojs>;
+	public errorMessage = ''
 
-	constructor(private ngZone: NgZone) {
+	@HostBinding('class.error') get isError(): boolean {
+		return Boolean(!this.src || this.errorMessage)
 	}
 
+	get videoPlayer(): HTMLVideoElement {
+		return this.videoPlayerElementRef?.nativeElement;
+	}
+
+	private hls!: Hls;
+
+	constructor(private ngZone: NgZone, private cd: ChangeDetectorRef) {}
+
 	public ngOnChanges(changes: SimpleChanges): void {
-		if (this.player) {
+		if (this.videoPlayer && this.hls) {
 			if (changes['src']?.currentValue) {
-				this.player.src(changes['src'].currentValue);
+				this.loadVideo(changes['src'].currentValue);
 			}
 
 			if (changes['currentTime']?.currentValue != null) {
-				this.player.currentTime(changes['currentTime']?.currentValue);
+				this.videoPlayer.currentTime = changes['currentTime'].currentValue;
 			}
 		}
 	}
 
-	public ngOnInit(): void {
-		this.initVideoJs();
+	public ngAfterViewInit(): void {
+		this.initVideo();
+	}
+
+	public onTimeUpdated(): void {
+		// We don't want to trigger change detection every when time gets updated
+		// because it won't have any visual effect, the progress is calculated only when we switch the lesson
+		this.ngZone.runOutsideAngular(() =>  {
+			this.timeWatch.emit(this.videoPlayer.currentTime)
+		})
 	}
 
 	public ngOnDestroy(): void {
-		if (this.player) {
-			this.player.dispose();
+		if (this.hls) {
+			this.hls.destroy();
 		}
 	}
 
-	private initVideoJs(): void {
-		const options: typeof videojs.options = {
-			controls: true,
-			autoplay: false,
-			preload: 'auto',
-			sources: [{
-				src: this.src,
-				type: 'application/x-mpegURL'
-			}
-			]
-		};
+	private initVideo(): void {
+		if (Hls.isSupported() && this.src) {
+			this.hls = new Hls();
+			this.loadVideo(this.src);
+			this.videoPlayer.currentTime = this.currentTime;
 
-		this.ngZone.runOutsideAngular(() => {
-			this.player = videojs(this.videoPlayer.nativeElement, options, () => {
-				// Set the initial time
-				this.player.currentTime(this.currentTime);
+			this.hls.on(Hls.Events.ERROR, (event, data) => {
+				this.errorMessage = 'Error while loading media:' + data.type + data.details
+				this.cd.markForCheck();
 			});
-		});
+		}
+	}
 
-		this.player.player().on('timeupdate', () => {
-			// We don't want to trigger change detection every when time gets updated
-			// because it won't have any visual effect, the progress is calculated only when we switch the lesson
-			this.ngZone.runOutsideAngular(() => {
-				this.timeWatch.emit(this.player.currentTime());
-			});
-		});
-
+	private loadVideo(src: string): void {
+		this.errorMessage = '';
+		this.hls.loadSource(src);
+		this.hls.attachMedia(this.videoPlayer);
+		this.cd.markForCheck();
 	}
 }

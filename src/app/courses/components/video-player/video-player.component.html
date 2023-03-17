@@ -1,1 +1,22 @@
-<video #videoPlayer crossOrigin="use-credentials" class="video-js vjs-default-skin"></video>
+<ng-container [ngSwitch]="true">
+  <video *ngSwitchCase="!!src && !errorMessage" #videoPlayer
+    crossOrigin="use-credentials"
+    [controls]="controls"
+    [muted]="muted"
+    class="video"
+    (timeupdate)="onTimeUpdated()"></video>
+
+  <p *ngSwitchCase="!src && !errorMessage">No video source provided</p>
+
+  <p *ngSwitchCase="!!errorMessage">{{ errorMessage }}</p>
+
+  <p *ngSwitchDefault> Something went wrong :/</p>
+</ng-container>
+
+
+
+
+
+
+
+

@@ -32,12 +32,9 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/pink-bluegrey.css",
-              "node_modules/video.js/dist/video-js.min.css",
               "src/styles.scss"
             ],
-            "scripts": [
-              "node_modules/video.js/dist/video.min.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -45,7 +42,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumError": "2mb"
                 },
                 {
                   "type": "anyComponentStyle",
