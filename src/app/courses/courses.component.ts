@@ -1,17 +1,20 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CoursesService } from './services/courses.service';
 import {
-	BehaviorSubject,
+	BehaviorSubject, catchError,
 	combineLatest,
 	debounceTime,
 	distinctUntilChanged,
 	map,
 	Observable,
+	of,
 	skip,
-	startWith
+	startWith, Subject,
+	switchMap
 } from 'rxjs';
 import { CourseModel } from './models/course.model';
 import { PageEvent } from '@angular/material/paginator';
+import { ViewStateModel } from './models/view-state.model';
 
 @Component({
 	selector: 'app-courses',
@@ -36,9 +39,11 @@ export class CoursesComponent {
 		startWith('')
 	);
 
+	private retrySubject = new Subject<void>();
+
 	private pageEventSubject = new BehaviorSubject<PageEvent>(this.initialPageEvent);
 
-	public viewModel$: Observable<{ paginator: PageEvent, courses: CourseModel[] }> = this.getViewModel();
+	public viewState$: Observable<ViewStateModel<{ paginator: PageEvent, courses: CourseModel[] }>> = this.getViewModel();
 
 	constructor(private coursesService: CoursesService) {
 	}
@@ -47,27 +52,43 @@ export class CoursesComponent {
 		return item.id;
 	}
 
+	public onSearchTermChange(searchTerm: string): void {
+		this.searchSubject.next(searchTerm ?? '');
+	}
+
 	public onPageChange(pageEvent: PageEvent): void {
 		this.pageEventSubject.next(pageEvent);
 	}
 
-	private getViewModel(): Observable<{ paginator: PageEvent, courses: CourseModel[] }> {
-		return combineLatest([
-			this.searchTermDebounced$,
-			this.pageEventSubject,
-			this.coursesService.getCourses()
-		])
-			.pipe(
-				map(([searchTerm, pageEvent, courses]) => {
-					return {
-						paginator: {
-							...pageEvent,
-							length: courses.length
-						},
-						courses: this.getPagedCourses(pageEvent, this.searchCourse(searchTerm, courses))
-					};
-				})
-			);
+	public retry(): void {
+		this.retrySubject.next();
+	}
+
+	private getViewModel(): Observable<ViewStateModel<{ paginator: PageEvent, courses: CourseModel[] }>> {
+		return this.retrySubject.pipe(
+			startWith(null),
+			switchMap(() => combineLatest([
+				this.searchTermDebounced$,
+				this.pageEventSubject,
+				this.coursesService.getCourses()
+			])
+				.pipe(
+					map(([searchTerm, pageEvent, courses]) => {
+						return {
+							isLoading: false,
+							data: {
+								paginator: {
+									...pageEvent,
+									length: courses.length
+								},
+								courses: this.getPagedCourses(pageEvent, this.searchCourse(searchTerm, courses))
+							}
+						};
+					}),
+					catchError(() => of({ isLoading: false, data: null, error: 'Could not load the page' })),
+					startWith({ isLoading: true, data: null })
+				))
+		);
 	}
 
 	private getPagedCourses(page: PageEvent, courses: CourseModel[]): CourseModel[] {
@@ -90,9 +111,5 @@ export class CoursesComponent {
 
 			return normalizedTitle.includes(normalizedSearchTerm) || normalizedDescription.includes(normalizedSearchTerm);
 		});
-	}
-
-	public onSearchTermChange(searchTerm: string): void {
-		this.searchSubject.next(searchTerm ?? '');
 	}
 }

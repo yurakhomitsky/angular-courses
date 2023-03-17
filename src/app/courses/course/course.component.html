@@ -1,68 +1,76 @@
-<ng-container *ngIf="course$ | async as course; else loading">
-  <button class="back-button" color="primary" mat-raised-button (click)="back()">Back To Courses</button>
+<ng-container *ngIf="viewState$ | async as viewState">
+  <app-loading-state *ngIf="viewState.isLoading" class="align-center-absolute"></app-loading-state>
 
-  <header class="course-header">
-    <h1>{{ course.title }}</h1>
+  <app-error-state *ngIf="viewState.error" class="align-center-absolute" [errorMessage]="viewState.error" >
+    <button color="primary" mat-raised-button (click)="back()">Back To Courses</button>
+  </app-error-state>
 
-    <mat-card class="course-card">
-      <img class="image-media" [src]="course.previewImageLink + '/cover.webp'" [alt]="course.title">
-      <mat-card-content class="course-card-content">
-        <div class="course-details">
-          <span>
-            <strong>Duration: </strong>{{ course.duration | duration }} minutes
-          </span>
-
-          <span>
-           <strong>Lessons: </strong>{{ course.lessons.length }}
-          </span>
-
-          <span>
-           <strong>Rating: </strong>{{ course.rating }}
-          </span>
-
-          <span>
-            <strong>Launch Date: </strong>{{ course.launchDate | date: 'dd/MM/yyyy' }}
-          </span>
-
-          <span>
-            <strong>Tags: </strong>{{ course.tags }}
-          </span>
-        </div>
-
-        <p><strong>Description:</strong></p>
-        <p>{{ course.description }}</p>
-      </mat-card-content>
-    </mat-card>
-  </header>
-
-  <main class="lesson-player">
-    <div class="player-box">
-      <app-video-player *ngIf="selectedLesson$ | async as selectedLesson; else noLessonSelected"
-        [src]="selectedLesson.link" [currentTime]="selectedLessonProgressTime" (timeWatch)="onTimeWatchChanged($event)"></app-video-player>
+  <ng-container *ngIf="viewState.data && !viewState.isLoading && !viewState.error">
+    <div>
+      <button color="primary" mat-raised-button (click)="back()">Back To Courses</button>
     </div>
 
-    <div class="lessons">
-      <mat-card *ngFor="let lesson of course.lessons; index as index"
-        class="lesson-card"
-        [class.active-lesson]="lesson.id === (selectedLesson$ | async)?.id"
-        [class.locked]="lesson.status === 'locked'"
-        (click)="selectLesson(lesson, index)">
+    <header class="course-header">
 
-        <mat-card-header class="lesson-card-header">
-          <mat-card-title>{{ lesson.order }} : {{ lesson.title }}</mat-card-title>
-          <mat-card-subtitle>{{ lesson.duration | duration }} </mat-card-subtitle>
-        </mat-card-header>
+      <h1>{{ viewState.data.title }}</h1>
 
-        <app-progress-bar [duration]="lesson.duration" [courseId]="course.id" [lessonId]="lesson.id"></app-progress-bar>
+      <mat-card class="course-card">
+        <img class="image-media" [src]="viewState.data.previewImageLink + '/cover.webp'" [alt]="viewState.data.title">
+        <mat-card-content class="course-card-content">
+          <div class="course-details">
+          <span>
+            <strong>Duration: </strong>{{ viewState.data.duration | duration }} minutes
+          </span>
+
+            <span>
+           <strong>Lessons: </strong>{{ viewState.data.lessons.length }}
+          </span>
+
+            <span>
+           <strong>Rating: </strong>{{ viewState.data.rating }}
+          </span>
+
+            <span>
+            <strong>Launch Date: </strong>{{ viewState.data.launchDate | date: 'dd/MM/yyyy' }}
+          </span>
+
+            <span>
+            <strong>Tags: </strong>{{ viewState.data.tags }}
+          </span>
+          </div>
+
+          <p><strong>Description:</strong></p>
+          <p>{{ viewState.data.description }}</p>
+        </mat-card-content>
       </mat-card>
-    </div>
-  </main>
+    </header>
+
+    <main class="lesson-player">
+      <div class="player-box">
+        <app-video-player *ngIf="selectedLesson$ | async as selectedLesson; else noLessonSelected"
+          [src]="selectedLesson.link" [currentTime]="selectedLessonProgressTime" (timeWatch)="onTimeWatchChanged($event)"></app-video-player>
+      </div>
+
+      <div class="lessons">
+        <mat-card *ngFor="let lesson of viewState.data.lessons; index as index"
+          class="lesson-card"
+          [class.active-lesson]="lesson.id === (selectedLesson$ | async)?.id"
+          [class.locked]="lesson.status === 'locked'"
+          (click)="selectLesson(lesson, index)">
+
+          <mat-card-header class="lesson-card-header">
+            <mat-card-title>{{ lesson.order }} : {{ lesson.title }}</mat-card-title>
+            <mat-card-subtitle>{{ lesson.duration | duration }} </mat-card-subtitle>
+          </mat-card-header>
+
+          <app-progress-bar [duration]="lesson.duration" [courseId]="viewState.data.id" [lessonId]="lesson.id"></app-progress-bar>
+        </mat-card>
+      </div>
+    </main>
+  </ng-container>
+
 </ng-container>
 
 <ng-template #noLessonSelected>
   <div>Please select a lesson</div>
-</ng-template>
-
-<ng-template #loading>
-  <mat-spinner class="spinner"></mat-spinner>
 </ng-template>

@@ -31,7 +31,6 @@ export class VideoPlayerComponent implements OnChanges, OnInit, OnDestroy {
 
 	public ngOnChanges(changes: SimpleChanges): void {
 		if (this.player) {
-			console.log(changes);
 			if (changes['src']?.currentValue) {
 				this.player.src(changes['src'].currentValue);
 			}
@@ -40,7 +39,6 @@ export class VideoPlayerComponent implements OnChanges, OnInit, OnDestroy {
 				this.player.currentTime(changes['currentTime']?.currentValue);
 			}
 		}
-
 	}
 
 	public ngOnInit(): void {
@@ -70,10 +68,15 @@ export class VideoPlayerComponent implements OnChanges, OnInit, OnDestroy {
 				// Set the initial time
 				this.player.currentTime(this.currentTime);
 			});
+		});
 
-			this.player.player().on('timeupdate', () => {
+		this.player.player().on('timeupdate', () => {
+			// We don't want to trigger change detection every when time gets updated
+			// because it won't have any visual effect, the progress is calculated only when we switch the lesson
+			this.ngZone.runOutsideAngular(() => {
 				this.timeWatch.emit(this.player.currentTime());
 			});
 		});
+
 	}
 }

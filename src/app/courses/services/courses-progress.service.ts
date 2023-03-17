@@ -6,19 +6,27 @@ import { LessonProgress } from '../models/lesson.progress';
 	providedIn: 'root'
 })
 export class CoursesProgressService {
-
-	private setOfLessonsIds = new Set<string>([]);
-
 	private readonly COURSE_PREFIX = 'course-';
 
-	constructor(private localStorageService: LocalStorageService) {
+	private setOfSavedLessonsIds = new Set<string>([]);
+	private courseLessonsMap = new Map<string, LessonProgress[]>();
+
+	constructor(private localStorageService: LocalStorageService) {}
+
+	public getCourseKey(courseId: string): string {
+		return `${this.COURSE_PREFIX}${courseId}`;
 	}
 
 	public getCourseLessons(courseId: string): LessonProgress[] {
-		const lessons: LessonProgress[]  = this.localStorageService.getItem(this.getCourseKey(courseId)) ?? [];
+		if (this.courseLessonsMap.has(this.getCourseKey(courseId))) {
+			return this.courseLessonsMap.get(this.getCourseKey(courseId)) ?? [];
+		}
 
-		this.setOfLessonsIds.clear();
-		lessons.forEach((lesson: LessonProgress) => this.setOfLessonsIds.add(lesson.id))
+		const lessons: LessonProgress[] = this.localStorageService.getItem(this.getCourseKey(courseId)) ?? [];
+
+		this.courseLessonsMap.set(this.getCourseKey(courseId), lessons);
+
+		lessons.forEach((lesson: LessonProgress) => this.setOfSavedLessonsIds.add(lesson.id));
 
 		return lessons;
 	}
@@ -28,6 +36,7 @@ export class CoursesProgressService {
 			.reduce((acc: number, lesson: LessonProgress) => acc + lesson.progressTime, 0);
 
 		const percentage = sum / courseDuration * 100;
+
 		return isNaN(percentage) ? 0 : percentage;
 	}
 
@@ -48,20 +57,21 @@ export class CoursesProgressService {
 		const { id, progressTime } = lessonProgress;
 
 		this.localStorageService.updateArray(courseKey, (lessons: LessonProgress[]) => {
-			const lessonProgressToSave = { id, progressTime: Math.floor(progressTime) }
+			const lessonProgressToSave = { id, progressTime: Math.floor(progressTime) };
 
-			if (this.setOfLessonsIds.has(id)) {
+			if (this.setOfSavedLessonsIds.has(id)) {
 				return lessons.map((lesson: LessonProgress) => {
 					return lesson.id === id ? lessonProgressToSave : lesson;
 				});
 			}
-
-			return [...lessons, lessonProgressToSave]
-
+			return [...lessons, lessonProgressToSave];
 		});
+
+		// To sync with LocalStorage data next time we ask for course lessons
+		this.clearCourseLessonsMap(courseId);
 	}
 
-	private getCourseKey(courseId: string): string {
-		return `${this.COURSE_PREFIX}${courseId}`;
+	private clearCourseLessonsMap(courseId: string): void {
+		this.courseLessonsMap.delete(this.getCourseKey(courseId));
 	}
 }

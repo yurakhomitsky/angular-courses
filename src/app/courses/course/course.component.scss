@@ -5,14 +5,10 @@ $my-palette: mat.define-palette(mat.$pink-palette);
 :host {
   display: flex;
   flex-direction: column;
+  gap: 2rem;
+  padding: 1rem 4rem;
+  min-height: 100%;
   position: relative;
-  gap: 3rem;
-  padding: 4.5rem 4rem;
-}
-
-.back-button {
-  position: absolute;
-  top: 1.2rem;
 }
 
 .course-card {
@@ -92,17 +88,25 @@ $my-palette: mat.define-palette(mat.$pink-palette);
   background-size: cover;
 }
 
-.spinner {
-  margin: 0 auto;
-}
-
 @media screen and (max-width: 1000px) {
-  .course-card  {
+  .course-card {
     flex-direction: column;
 
     .image-media {
       max-width: none;
-
     }
+  }
+}
+
+@media screen and (max-width: 960px) {
+  .lesson-player {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 1fr;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  :host {
+    padding: 2.5rem 2rem;
   }
 }

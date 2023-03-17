@@ -16,6 +16,8 @@ import { VideoPlayerComponent } from './components/video-player/video-player.com
 import { DurationPipe } from './pipes/duration.pipe';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ErrorStateComponent } from './components/error-state/error-state.component';
+import { LoadingStateComponent } from './components/loading-state/loading-state.component';
 
 const routes: Routes = [
   { path: 'courses', pathMatch: 'full', component: CoursesComponent },
@@ -28,7 +30,9 @@ const routes: Routes = [
     CourseComponent,
     VideoPlayerComponent,
     DurationPipe,
-    ProgressBarComponent
+    ProgressBarComponent,
+    ErrorStateComponent,
+    LoadingStateComponent
   ],
   imports: [
     CommonModule,

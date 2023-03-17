@@ -1,44 +1,49 @@
-<ng-container *ngIf="viewModel$ | async as viewModel; else loading">
-  <mat-form-field class="search-field">
-    <input matInput placeholder="Search.." [ngModel]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
-  </mat-form-field>
+<ng-container *ngIf="viewState$ | async as viewState">
+  <app-loading-state *ngIf="viewState.isLoading" class="align-center-absolute"></app-loading-state>
+  <app-error-state *ngIf="viewState.error" class="align-center-absolute" [errorMessage]="viewState.error">
+    <button color="primary" mat-raised-button (click)="retry()">Retry</button>
+  </app-error-state>
 
-  <div class="course-cards-grid">
-    <mat-card class="course-card" *ngFor="let course of viewModel.courses; trackBy: trackById">
-      <img class="image-media" [src]="course.previewImageLink + '/cover.webp'" [alt]="course.title">
-      <app-progress-bar [duration]="course.duration" [courseId]="course.id"></app-progress-bar>
+  <ng-container *ngIf="viewState.data && !viewState.isLoading && !viewState.error">
+    <mat-form-field class="search-field">
+      <input matInput placeholder="Search..." [ngModel]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
+    </mat-form-field>
 
-      <mat-card-header>
-        <mat-card-title>{{ course.title }}</mat-card-title>
-      </mat-card-header>
+    <div class="course-cards-grid">
+      <mat-card class="course-card" *ngFor="let course of viewState.data.courses; trackBy: trackById">
+        <img class="image-media" [src]="course.previewImageLink + '/cover.webp'" [alt]="course.title">
+        <app-progress-bar [duration]="course.duration" [courseId]="course.id"></app-progress-bar>
 
-      <mat-card-content class="course-card-content">
-        <div class="course-details">
-          <span><strong>Duration: </strong>{{ course.duration | duration }} minutes</span>
-          <span><strong>Lessons: </strong> {{ course.lessonsCount }}</span>
-          <span><strong>Rating: </strong> {{ course.rating }}</span>
-          <span><strong>Status: </strong> {{ course.status }}</span>
-        </div>
-        <div *ngIf="course.meta.skills"><strong>Skills: </strong>{{ course.meta.skills }}</div>
-      </mat-card-content>
+        <mat-card-header>
+          <mat-card-title>{{ course.title }}</mat-card-title>
+        </mat-card-header>
 
-      <mat-card-actions align="end">
-        <a mat-raised-button color="primary" [routerLink]="course.id">Watch</a>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+        <mat-card-content class="course-card-content">
+          <div class="course-details">
+            <span><strong>Duration: </strong>{{ course.duration | duration }} minutes</span>
+            <span><strong>Lessons: </strong> {{ course.lessonsCount }}</span>
+            <span><strong>Rating: </strong> {{ course.rating }}</span>
+            <span><strong>Status: </strong> {{ course.status }}</span>
+          </div>
+          <div *ngIf="course.meta.skills"><strong>Skills: </strong>{{ course.meta.skills }}</div>
+        </mat-card-content>
 
-  <mat-paginator
-    class="paginator"
-    aria-label="Select page"
-    [pageIndex]="viewModel.paginator.pageIndex"
-    [length]="viewModel.paginator.length"
-    [pageSize]="viewModel.paginator.pageSize"
-    [showFirstLastButtons]="true"
-    (page)="onPageChange($event)">
-  </mat-paginator>
+        <mat-card-actions align="end">
+          <a mat-raised-button color="primary" [routerLink]="course.id">Watch</a>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <mat-paginator
+      class="paginator"
+      aria-label="Select page"
+      [pageIndex]="viewState.data.paginator.pageIndex"
+      [length]="viewState.data.paginator.length"
+      [pageSize]="viewState.data.paginator.pageSize"
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </ng-container>
+
 </ng-container>
 
-<ng-template #loading>
-  <mat-spinner></mat-spinner>
-</ng-template>

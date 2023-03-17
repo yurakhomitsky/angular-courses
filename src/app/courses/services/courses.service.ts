@@ -18,7 +18,7 @@ export class CoursesService {
 			resetOnRefCountZero: false,
 			resetOnError: true,
 			// Invalidate cache on timeout
-			resetOnComplete: () => timer(10_000)
+			resetOnComplete: () => timer(60_00_00)
 		})
 	);
 
@@ -26,7 +26,7 @@ export class CoursesService {
 	}
 
 	public getCourses(): Observable<CourseModel[]> {
-		return this.cachedCourses$;
+		return this.cachedCourses$
 	}
 
 	public getCourse(id: string): Observable<SingleCourseModel> {

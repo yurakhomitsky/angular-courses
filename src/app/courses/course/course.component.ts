@@ -1,12 +1,13 @@
-import { ChangeDetectionStrategy, Component, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { BehaviorSubject, map, Observable, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
 import { CoursesService } from '../services/courses.service';
 import { SingleCourseModel } from '../models/single-course.model';
 import { LessonModel } from '../models/lesson.model';
 import { Location } from '@angular/common';
 import { CoursesProgressService } from '../services/courses-progress.service';
 import { ProgressBarComponent } from '../components/progress-bar/progress-bar.component';
+import { ViewStateModel } from '../models/view-state.model';
 
 @Component({
 	selector: 'app-course',
@@ -14,7 +15,7 @@ import { ProgressBarComponent } from '../components/progress-bar/progress-bar.co
 	styleUrls: ['./course.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CourseComponent {
+export class CourseComponent implements OnDestroy {
 	private courseId = '';
 
 	private selectedLessonSubject = new BehaviorSubject<LessonModel | null>(null);
@@ -23,7 +24,6 @@ export class CourseComponent {
 
 	public selectedLessonProgressTime = 0;
 	public updatedSelectedLessonProgressTime = 0;
-
 	private selectedLessonIndex = 0;
 
 	private courseId$: Observable<string> = this.router.params.pipe(
@@ -31,13 +31,19 @@ export class CourseComponent {
 		tap((courseId: string) => this.courseId = courseId)
 	);
 
-	public course$: Observable<SingleCourseModel> = this.courseId$.pipe(
-		switchMap((courseId: string) => this.coursesService.getCourse(courseId)),
-		tap((course: SingleCourseModel) => {
-			this.sortLessons(course);
-			const [lesson, index] = this.findNotLockedLessonAndIndex(course.lessons);
-			this.updateSelectedLesson(lesson, index);
-		})
+	public viewState$: Observable<ViewStateModel<SingleCourseModel>> = this.courseId$.pipe(
+		switchMap((courseId: string) => this.coursesService.getCourse(courseId).pipe(
+			tap((course: SingleCourseModel) => {
+				this.sortLessons(course);
+				const [lesson, index] = this.findNotLockedLessonAndIndex(course.lessons);
+				this.updateSelectedLesson(lesson, index);
+			}),
+			map((course: SingleCourseModel) => {
+				return { isLoading: false, data: course };
+			}),
+			catchError(() => of({ isLoading: false, data: null, error: 'Could not load the course' })),
+			startWith({ isLoading: true, data: null })
+		))
 	);
 
 	@ViewChildren(ProgressBarComponent)
@@ -49,6 +55,10 @@ export class CourseComponent {
 		private coursesService: CoursesService,
 		private coursesProgressService: CoursesProgressService
 	) {
+	}
+
+	public ngOnDestroy(): void {
+		this.savePreviousLessonProgress();
 	}
 
 	public back(): void {
@@ -75,7 +85,7 @@ export class CourseComponent {
 
 	private savePreviousLessonProgress(): void {
 		this.coursesProgressService.saveLessonProgress(this.courseId, {
-			id: this.selectedLessonSubject.getValue()!.id,
+			id: this.selectedLessonSubject.getValue()?.id ?? '',
 			progressTime: this.updatedSelectedLessonProgressTime
 		});
 	}
@@ -89,7 +99,6 @@ export class CourseComponent {
 
 		return [lessons[index], index];
 	}
-
 
 	private sortLessons(course: SingleCourseModel): void {
 		course.lessons.sort((a: LessonModel, b: LessonModel) => a.order - b.order);

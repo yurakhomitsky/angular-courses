@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { VideoPlayerComponent } from '../components/video-player/video-player.component';
 import { RouterTestingModule } from '@angular/router/testing';
+import { CoursesProgressService } from '../services/courses-progress.service';
 
 describe('CourseComponent', () => {
 	let component: CourseComponent;
@@ -23,10 +24,16 @@ describe('CourseComponent', () => {
 					CommonModule,
 					RouterTestingModule
 				],
-				providers: [{
-					provide: CoursesService,
-					useValue: jasmine.createSpyObj('CoursesService', ['getCourses', 'getCourse'])
-				}]
+				providers: [
+					{
+						provide: CoursesService,
+						useValue: jasmine.createSpyObj('CoursesService', ['getCourses', 'getCourse'])
+					},
+					{
+						provide: CoursesProgressService,
+						useValue: jasmine.createSpyObj('CoursesProgressService', ['saveLessonProgress', 'getLessonProgress'])
+					}
+				]
 			})
 			.compileComponents();
 
