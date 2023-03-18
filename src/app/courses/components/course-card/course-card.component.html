@@ -14,7 +14,7 @@
       <span><strong>Rating: </strong> {{ course.rating }}</span>
       <span><strong>Status: </strong> {{ course.status }}</span>
     </div>
-    <div *ngIf="course.meta.skills"><strong>Skills: </strong>{{ course.meta.skills }}</div>
+    <div *ngIf="course.meta.skills"><strong>Skills: </strong> <span>{{ course.meta.skills }}</span></div>
   </mat-card-content>
 
   <mat-card-actions align="end">

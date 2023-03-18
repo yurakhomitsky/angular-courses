@@ -8,6 +8,7 @@
   padding: 2rem 0;
   position: relative;
   min-height: 100%;
+  gap: 1rem;
 }
 
 .search-field {
@@ -22,7 +23,6 @@
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(3, 1fr);
-  margin-bottom: 1rem;
 }
 
 @media screen and (max-width: 960px) {
