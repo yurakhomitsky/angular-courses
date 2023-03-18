@@ -4,7 +4,6 @@ import {
 	ChangeDetectorRef,
 	Component,
 	ElementRef, EventEmitter,
-	HostBinding,
 	Input, NgZone, OnChanges,
 	OnDestroy,
 	 Output,
@@ -22,6 +21,7 @@ import  Hls from 'hls.js';
 export class VideoPlayerComponent implements OnChanges, AfterViewInit, OnDestroy {
 	@Input() public src = '';
 	@Input() public currentTime = 0;
+	@Input() public poster = '';
 
 	@Input() public muted = false;
 	@Input() public controls = true;
@@ -31,10 +31,6 @@ export class VideoPlayerComponent implements OnChanges, AfterViewInit, OnDestroy
 	@ViewChild('videoPlayer') public videoPlayerElementRef!: ElementRef;
 
 	public errorMessage = ''
-
-	@HostBinding('class.error') get isError(): boolean {
-		return Boolean(!this.src || this.errorMessage)
-	}
 
 	get videoPlayer(): HTMLVideoElement {
 		return this.videoPlayerElementRef?.nativeElement;
@@ -48,6 +44,7 @@ export class VideoPlayerComponent implements OnChanges, AfterViewInit, OnDestroy
 		if (this.videoPlayer && this.hls) {
 			if (changes['src']?.currentValue) {
 				this.loadVideo(changes['src'].currentValue);
+				this.videoPlayer.play();
 			}
 
 			if (changes['currentTime']?.currentValue != null) {
@@ -82,6 +79,7 @@ export class VideoPlayerComponent implements OnChanges, AfterViewInit, OnDestroy
 
 			this.hls.on(Hls.Events.ERROR, (event, data) => {
 				this.errorMessage = 'Error while loading media:' + data.type + data.details
+				this.hls.detachMedia();
 				this.cd.markForCheck();
 			});
 		}
@@ -89,7 +87,9 @@ export class VideoPlayerComponent implements OnChanges, AfterViewInit, OnDestroy
 
 	private loadVideo(src: string): void {
 		this.errorMessage = '';
+		this.hls.detachMedia();
 		this.hls.loadSource(src);
+
 		this.hls.attachMedia(this.videoPlayer);
 		this.cd.markForCheck();
 	}

@@ -1,13 +1,13 @@
 <ng-container *ngIf="viewState$ | async as viewState">
   <app-loading-state *ngIf="viewState.isLoading" class="align-center-absolute"></app-loading-state>
 
-  <app-error-state *ngIf="viewState.error" class="align-center-absolute" [errorMessage]="viewState.error" >
-    <button color="primary" mat-raised-button (click)="back()">Back To Courses</button>
+  <app-error-state *ngIf="viewState.error" class="align-center-absolute" [errorMessage]="viewState.error">
+    <button routerLink="../" color="primary" mat-raised-button>Back To Courses</button>
   </app-error-state>
 
   <ng-container *ngIf="viewState.data && !viewState.isLoading && !viewState.error">
     <div>
-      <button color="primary" mat-raised-button (click)="back()">Back To Courses</button>
+      <button routerLink="../" color="primary" mat-raised-button>Back To Courses</button>
     </div>
 
     <header class="course-header">
@@ -19,7 +19,7 @@
         <mat-card-content class="course-card-content">
           <div class="course-details">
           <span>
-            <strong>Duration: </strong>{{ viewState.data.duration | duration }} minutes
+            <strong>Duration: </strong>{{ viewState.data.duration | duration }}
           </span>
 
             <span>
@@ -47,24 +47,22 @@
 
     <main class="lesson-player">
       <div class="player-box">
-        <app-video-player *ngIf="selectedLesson$ | async as selectedLesson; else noLessonSelected"
-          [src]="selectedLesson.link" [currentTime]="selectedLessonProgressTime" (timeWatch)="onTimeWatchChanged($event)"></app-video-player>
+        <app-video-player class="video-player" *ngIf="selectedLesson; else noLessonSelected"
+          [src]="selectedLesson.link"
+          [poster]="selectedLesson.previewImageLink + '/lesson-' + selectedLesson.order + '.webp'"
+          [currentTime]="selectedLessonProgressTime"
+          (timeWatch)="onTimeWatchChanged($event)"></app-video-player>
       </div>
 
       <div class="lessons">
-        <mat-card *ngFor="let lesson of viewState.data.lessons; index as index"
-          class="lesson-card"
-          [class.active-lesson]="lesson.id === (selectedLesson$ | async)?.id"
-          [class.locked]="lesson.status === 'locked'"
-          (click)="selectLesson(lesson, index)">
-
-          <mat-card-header class="lesson-card-header">
-            <mat-card-title>{{ lesson.order }} : {{ lesson.title }}</mat-card-title>
-            <mat-card-subtitle>{{ lesson.duration | duration }} </mat-card-subtitle>
-          </mat-card-header>
-
-          <app-progress-bar [duration]="lesson.duration" [courseId]="viewState.data.id" [lessonId]="lesson.id"></app-progress-bar>
-        </mat-card>
+        <app-lesson-card *ngFor="let lesson of viewState.data.lessons; index as index"
+          [class.active-lesson]="isLessonSelected(lesson.order)"
+          [lesson]="lesson"
+          [courseId]="viewState.data.id"
+          [routerLink]="[]"
+          [queryParams]="{ lesson: index + 1 }"
+          (click)="selectLesson(lesson, index)"
+        ></app-lesson-card>
       </div>
     </main>
   </ng-container>

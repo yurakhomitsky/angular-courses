@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  HostBinding,
+  Input
+} from '@angular/core';
 import { CoursesProgressService } from '../../services/courses-progress.service';
 
 @Component({
@@ -13,10 +19,14 @@ import { CoursesProgressService } from '../../services/courses-progress.service'
       }
     `
   ],
-  exportAs: 'progressBar',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProgressBarComponent {
+  @HostBinding('class.progress-completed')
+  public get isProgressCompleted(): boolean {
+    return this.progress >= 100;
+  }
+
   @Input() public duration = 0;
 
   @Input() public courseId = ''

@@ -18,6 +18,8 @@ import { ProgressBarComponent } from './components/progress-bar/progress-bar.com
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ErrorStateComponent } from './components/error-state/error-state.component';
 import { LoadingStateComponent } from './components/loading-state/loading-state.component';
+import { CourseCardComponent } from './components/course-card/course-card.component';
+import { LessonCardComponent } from './components/lesson-card/lesson-card.component';
 
 const routes: Routes = [
   { path: 'courses', pathMatch: 'full', component: CoursesComponent },
@@ -32,7 +34,9 @@ const routes: Routes = [
     DurationPipe,
     ProgressBarComponent,
     ErrorStateComponent,
-    LoadingStateComponent
+    LoadingStateComponent,
+    CourseCardComponent,
+    LessonCardComponent
   ],
   imports: [
     CommonModule,

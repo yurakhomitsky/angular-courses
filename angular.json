@@ -96,7 +96,6 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/pink-bluegrey.css",
-              "node_modules/video.js/dist/video-js.min.css",
               "src/styles.scss"
             ],
             "scripts": []

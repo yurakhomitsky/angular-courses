@@ -1,9 +1,18 @@
-# BetterMe - is an Angular application which shows list of courses for self-improvement
+# BetterMe - designed to provide you with the knowledge and skills necessary to improve yourself and your life.
+The application is built using the Angular framework and Angular Material
 
-## Development server
+## To get started with the application, simply clone the repository to your local machine and follow the instructions;
+- Run `ng serve` or `npm run start` for a dev server. Navigate to `http://localhost:4200/`
+- Run `ng test` or `npm run test` to execute the unit tests;
 
-Run `ng serve` or `npm run start` for a dev server. Navigate to `http://localhost:4200/`
+## Courses Page
 
-## Running unit tests
+![img.png](img.png)
 
-Run `ng test` or `npm run test` to execute the unit tests;
+---
+![img_1.png](img_1.png)
+
+
+## Single Course
+
+![img_2.png](img_2.png)

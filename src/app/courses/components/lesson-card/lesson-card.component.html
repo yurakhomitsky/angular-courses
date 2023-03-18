@@ -1,0 +1,9 @@
+<mat-card class="lesson-card">
+
+  <mat-card-header class="lesson-card-header">
+    <mat-card-title>{{ lesson.order }} : {{ lesson.title }}</mat-card-title>
+    <mat-card-subtitle>{{ lesson.duration | duration }} </mat-card-subtitle>
+  </mat-card-header>
+
+  <app-progress-bar [courseId]="courseId" [lessonId]="lesson.id" [duration]="lesson.duration"></app-progress-bar>
+</mat-card>

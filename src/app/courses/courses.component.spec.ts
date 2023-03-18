@@ -11,6 +11,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { ErrorStateComponent } from './components/error-state/error-state.component';
+import { LoadingStateComponent } from './components/loading-state/loading-state.component';
 
 describe('CoursesComponent', () => {
 	let component: CoursesComponent;
@@ -18,7 +20,7 @@ describe('CoursesComponent', () => {
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-				declarations: [CoursesComponent],
+				declarations: [CoursesComponent, ErrorStateComponent, LoadingStateComponent],
 				imports: [BrowserTestingModule,
 					MatProgressSpinnerModule,
 					FormsModule,
