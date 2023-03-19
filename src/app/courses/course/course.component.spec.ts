@@ -31,7 +31,10 @@ describe('CourseComponent', () => {
 					},
 					{
 						provide: CoursesProgressService,
-						useValue: jasmine.createSpyObj('CoursesProgressService', ['saveLessonProgress', 'getLessonProgress'])
+						useValue:  {
+							saveLessonProgress: jasmine.createSpy('saveLessonProgress'),
+							getCourseLessonsProgress: jasmine.createSpy('getCourseLessonsProgress').and.returnValue([])
+						}
 					}
 				]
 			})

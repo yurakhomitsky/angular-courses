@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
 	catchError,
@@ -15,7 +15,7 @@ import { LessonModel } from '../models/lesson.model';
 import { CoursesProgressService } from '../services/courses-progress.service';
 import { ViewStateModel } from '../models/view-state.model';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
-import { LessonCardComponent } from '../components/lesson-card/lesson-card.component';
+import { LessonProgress } from '../models/lesson.progress';
 
 @Component({
 	selector: 'app-course',
@@ -23,14 +23,15 @@ import { LessonCardComponent } from '../components/lesson-card/lesson-card.compo
 	styleUrls: ['./course.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CourseComponent implements OnDestroy {
-	private courseId = '';
+export class CourseComponent implements OnInit, OnDestroy {
+	private courseId = this.activatedRoute.snapshot.params['id'];
 
 	public selectedLesson: LessonModel | null = null;
 
-	public selectedLessonProgressTime = 0;
 	public updatedSelectedLessonProgressTime = 0;
 	private selectedLessonIndex = 0;
+
+	private lessonsProgressTimeMap = new Map<string, number>()
 
 	private courseId$: Observable<string> = this.activatedRoute.params.pipe(
 		map((params: Params) => params['id']),
@@ -53,15 +54,20 @@ export class CourseComponent implements OnDestroy {
 		))
 	);
 
-	@ViewChildren(LessonCardComponent)
-	public lessonCards!: QueryList<LessonCardComponent>;
-
 	constructor(
 		private activatedRoute: ActivatedRoute,
 		private router: Router,
 		private coursesService: CoursesService,
 		private coursesProgressService: CoursesProgressService
 	) {}
+
+	public ngOnInit(): void {
+		this.populateLessonsProgressMap();
+	}
+
+	public getLessonProgressTime(lessonId: string): number {
+		return this.lessonsProgressTimeMap.get(lessonId) ?? 0;
+	}
 
 	public ngOnDestroy(): void {
 		this.savePreviousLessonProgress();
@@ -74,7 +80,6 @@ export class CourseComponent implements OnDestroy {
 	public updateSelectedLesson(lesson: LessonModel, index: number): void {
 		this.selectedLessonIndex = index;
 		this.selectedLesson = lesson;
-		this.selectedLessonProgressTime = this.coursesProgressService.getLessonProgress(this.courseId, lesson.id)?.progressTime ?? 0;
 	}
 
 	public selectLesson(lesson: LessonModel, index: number): void {
@@ -97,7 +102,7 @@ export class CourseComponent implements OnDestroy {
 	}
 
 	private recalculateProgressForPreviousLesson(): void {
-		this.lessonCards.get(this.selectedLessonIndex)?.recalculate();
+		this.lessonsProgressTimeMap.set(this.selectedLesson!.id, this.updatedSelectedLessonProgressTime)
 	}
 
 	private getInitialSelectedLessonAndIndex(lessons: LessonModel[]): [LessonModel, number] {
@@ -114,4 +119,11 @@ export class CourseComponent implements OnDestroy {
 	private sortLessons(course: SingleCourseModel): void {
 		course.lessons.sort((a: LessonModel, b: LessonModel) => a.order - b.order);
 	}
+
+	private populateLessonsProgressMap(): void {
+		this.coursesProgressService.getCourseLessonsProgress(this.courseId).forEach((lessonProgress: LessonProgress) => {
+			this.lessonsProgressTimeMap.set(lessonProgress.id, lessonProgress.progressTime)
+		})
+	}
+
 }

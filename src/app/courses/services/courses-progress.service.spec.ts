@@ -41,7 +41,7 @@ describe('CoursesProgressService', () => {
 
 			localStorageServiceSpy.getItem.and.returnValue(expectedLessons);
 
-			const actualLessons = service.getCourseLessons(courseId);
+			const actualLessons = service.getCourseLessonsProgress(courseId);
 
 			expect(localStorageServiceSpy.getItem).toHaveBeenCalledWith('course-test-course');
 			expect(actualLessons).toEqual(expectedLessons);
@@ -52,100 +52,26 @@ describe('CoursesProgressService', () => {
 
 			localStorageServiceSpy.getItem.and.returnValue(null);
 
-			const actualLessons = service.getCourseLessons(courseId);
+			const actualLessons = service.getCourseLessonsProgress(courseId);
 
 			expect(localStorageServiceSpy.getItem).toHaveBeenCalledWith('course-test-course');
 			expect(actualLessons).toEqual([]);
 		});
 	});
 
-	describe('calculateCourseProgressPercentage', () => {
-		it('should return the correct percentage', () => {
+	describe('calculateCourseProgressTime', () => {
+		it('should return the correct progress time', () => {
 			const courseId = 'test-course';
-			const courseDuration = 100;
-			const expectedPercentage = 30;
+			const expectedProgressTime = 30;
 
-			spyOn(service, 'getCourseLessons').and.returnValue([
+			spyOn(service, 'getCourseLessonsProgress').and.returnValue([
 				{ id: 'lesson-1', progressTime: 10 },
 				{ id: 'lesson-2', progressTime: 20 }
 			]);
 
-			const actualPercentage = service.calculateCourseProgressPercentage(courseId, courseDuration);
+			const actualPercentage = service.calculateCourseProgressTime(courseId);
 
-			expect(actualPercentage).toEqual(expectedPercentage);
-		});
-
-		it('should return 0 if the percentage is NaN', () => {
-			const courseId = 'test-course';
-			const courseDuration = 100;
-
-			spyOn(service, 'getCourseLessons').and.returnValue([
-				{ id: 'lesson-1', progressTime: 0 },
-				{ id: 'lesson-2', progressTime: 0 }
-			]);
-
-			const actualPercentage = service.calculateCourseProgressPercentage(courseId, courseDuration);
-
-			expect(actualPercentage).toEqual(0);
-		});
-	});
-
-	describe('getLessonProgress', () => {
-		it('should return the lesson progress', () => {
-			const courseId = 'test-course';
-			const lessonId = 'test-lesson';
-			const expectedLessonProgress = { id: lessonId, progressTime: 10 };
-
-			spyOn(service, 'getCourseLessons').and.returnValue([
-				{ id: 'lesson-1', progressTime: 5 },
-				expectedLessonProgress,
-				{ id: 'lesson-3', progressTime: 15 }
-			]);
-
-			const actualLessonProgress = service.getLessonProgress(courseId, lessonId);
-
-			expect(actualLessonProgress).toEqual(expectedLessonProgress);
-		});
-
-		it('should return null if lesson is not found', () => {
-			const courseId = 'test-course';
-			const lessonId = 'test-lesson';
-
-			spyOn(service, 'getCourseLessons').and.returnValue([
-				{ id: 'lesson-1', progressTime: 5 },
-				{ id: 'lesson-3', progressTime: 15 }
-			]);
-
-			const actualLessonProgress = service.getLessonProgress(courseId, lessonId);
-
-			expect(actualLessonProgress).toEqual(null);
-		});
-	});
-
-	describe('calculateLessonProgressPercentage', () => {
-		it('should return correct percentage', () => {
-			const courseId = 'test-course';
-			const lessonId = 'lesson-1';
-			const lessonDuration = 100;
-			const expectedPercentage = 50;
-
-			spyOn(service, 'getLessonProgress').and.returnValue({ id: 'lesson-1', progressTime: 50 });
-
-			const actualLessonProgress = service.calculateLessonProgressPercentage(courseId, lessonId, lessonDuration);
-
-			expect(actualLessonProgress).toEqual(expectedPercentage);
-		});
-
-		it('should return 0 if the percentage is NaN', () => {
-			const courseId = 'test-course';
-			const lessonId = 'lesson-1';
-			const lessonDuration = 100;
-
-			spyOn(service, 'getLessonProgress').and.returnValue({ id: 'lesson-1', progressTime: 0 });
-
-			const actualPercentage = service.calculateLessonProgressPercentage(courseId, lessonId, lessonDuration);
-
-			expect(actualPercentage).toEqual(0);
+			expect(actualPercentage).toEqual(expectedProgressTime);
 		});
 	});
 
@@ -181,7 +107,7 @@ describe('CoursesProgressService', () => {
 
 			localStorageServiceSpy.getItem.and.returnValue(savedLessons);
 
-			service.getCourseLessons(courseId);
+			service.getCourseLessonsProgress(courseId);
 
 			localStorageServiceSpy.updateArray.and.callFake((key: string, updater: (value: any) => any[]) => {
 

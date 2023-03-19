@@ -25,6 +25,14 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
+.no-courses {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+}
+
 @media screen and (max-width: 960px) {
   :host {
     max-width: none;

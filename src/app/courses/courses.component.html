@@ -9,9 +9,11 @@
       <input matInput placeholder="Search..." [ngModel]="searchTerm" (ngModelChange)="onSearchTermChange($event)"/>
     </mat-form-field>
 
-    <div class="course-cards-grid">
+    <div class="course-cards-grid" *ngIf="viewState.data.courses.length; else noCourses">
       <app-course-card *ngFor="let course of viewState.data.courses; trackBy: trackById"
-        [course]="course" ></app-course-card>
+        [course]="course"
+        [progress]="course.id | courseProgressTime | progressPercentage : course.duration"
+      ></app-course-card>
     </div>
 
     <mat-paginator
@@ -27,3 +29,9 @@
 
 </ng-container>
 
+
+<ng-template #noCourses>
+  <div class="no-courses">
+    <p>There are no courses</p>
+  </div>
+</ng-template>

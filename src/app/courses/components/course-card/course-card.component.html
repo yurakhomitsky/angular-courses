@@ -1,7 +1,7 @@
 <mat-card class="course-card" >
   <img class="image-media" [src]="course.previewImageLink + '/cover.webp'" [alt]="course.title">
 
-  <app-progress-bar [courseId]="course.id" [duration]="course.duration"></app-progress-bar>
+  <app-progress-bar [progress]="progress"></app-progress-bar>
 
   <mat-card-header>
     <mat-card-title>{{ course.title }}</mat-card-title>

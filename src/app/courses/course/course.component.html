@@ -50,7 +50,7 @@
         <app-video-player class="video-player" *ngIf="selectedLesson; else noLessonSelected"
           [src]="selectedLesson.link"
           [poster]="selectedLesson.previewImageLink + '/lesson-' + selectedLesson.order + '.webp'"
-          [currentTime]="selectedLessonProgressTime"
+          [currentTime]="getLessonProgressTime(selectedLesson.id)"
           (timeWatch)="onTimeWatchChanged($event)"></app-video-player>
       </div>
 
@@ -58,6 +58,7 @@
         <app-lesson-card *ngFor="let lesson of viewState.data.lessons; index as index"
           [class.active-lesson]="isLessonSelected(lesson.order)"
           [lesson]="lesson"
+          [progress]="getLessonProgressTime(lesson.id) | progressPercentage : lesson.duration"
           [courseId]="viewState.data.id"
           [routerLink]="[]"
           [queryParams]="{ lesson: index + 1 }"

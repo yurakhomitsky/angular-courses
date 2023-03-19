@@ -20,6 +20,8 @@ import { ErrorStateComponent } from './components/error-state/error-state.compon
 import { LoadingStateComponent } from './components/loading-state/loading-state.component';
 import { CourseCardComponent } from './components/course-card/course-card.component';
 import { LessonCardComponent } from './components/lesson-card/lesson-card.component';
+import { CourseProgressTimePipe } from './pipes/course-progress-time.pipe';
+import { ProgressPercentagePipe } from './pipes/progress-percentage.pipe';
 
 const routes: Routes = [
   { path: 'courses', pathMatch: 'full', component: CoursesComponent },
@@ -36,7 +38,9 @@ const routes: Routes = [
     ErrorStateComponent,
     LoadingStateComponent,
     CourseCardComponent,
-    LessonCardComponent
+    LessonCardComponent,
+    CourseProgressTimePipe,
+    ProgressPercentagePipe
   ],
   imports: [
     CommonModule,

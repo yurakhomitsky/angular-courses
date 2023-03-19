@@ -9,5 +9,6 @@ import { CourseModel } from '../../models/course.model';
 })
 export class CourseCardComponent {
   @Input() public course!: CourseModel;
+  @Input() public progress = 0;
 
 }

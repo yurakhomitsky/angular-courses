@@ -14,29 +14,12 @@ export class CoursesProgressService {
 		return `${this.COURSE_PREFIX}${courseId}`;
 	}
 
-	public getCourseLessons(courseId: string): LessonProgress[] {
+	public getCourseLessonsProgress(courseId: string): LessonProgress[] {
 		return this.localStorageService.getItem(this.getCourseKey(courseId)) ?? [];
 	}
 
-	public getLessonProgress(courseId: string, lessonId: string): LessonProgress | null {
-		return this.getCourseLessons(courseId).find((lesson: LessonProgress) => lesson.id === lessonId) ?? null;
-	}
-
-	public calculateCourseProgressPercentage(courseId: string, courseDuration: number): number {
-		const sum = this.getCourseLessons(courseId)
-			.reduce((acc: number, lesson: LessonProgress) => acc + lesson.progressTime, 0);
-
-		const percentage = sum / courseDuration * 100;
-
-		return isNaN(percentage) ? 0 : percentage;
-	}
-
-	public calculateLessonProgressPercentage(courseId: string, lessonId: string, lessonDuration: number): number {
-		const progressTime = this.getLessonProgress(courseId, lessonId)?.progressTime ?? 0;
-
-		const percentage = progressTime / lessonDuration * 100;
-
-		return isNaN(percentage) ? 0 : percentage;
+	public calculateCourseProgressTime(courseId: string): number {
+		return this.getCourseLessonsProgress(courseId).reduce((acc: number, lesson: LessonProgress) => acc + lesson.progressTime, 0);
 	}
 
 	public saveLessonProgress(courseId: string, lessonProgress: LessonProgress): void {

@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, HostBinding, Input, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
 import { LessonModel } from '../../models/lesson.model';
-import { ProgressBarComponent } from '../progress-bar/progress-bar.component';
 
 @Component({
   selector: 'app-lesson-card',
@@ -10,17 +9,12 @@ import { ProgressBarComponent } from '../progress-bar/progress-bar.component';
 })
 export class LessonCardComponent {
   @Input() public lesson!: LessonModel;
+  @Input() public progress = 0;
   @Input() public courseId!: string;
-
-  @ViewChild(ProgressBarComponent, { static: true })
-  private progressBar!: ProgressBarComponent
 
   @HostBinding('class.locked')
   public get isLocked(): boolean {
     return this.lesson.status === 'locked';
   }
 
-  public recalculate(): void {
-    this.progressBar.recalculate();
-  }
 }
